@@ -61,8 +61,14 @@ jobs:
         run: |
           helm upgrade --install elasticsearch elastic/elasticsearch \
             --namespace observability \
-            -f charts-values/elasticsearch-values.yaml
-
+            --set replicas=1 \
+            --set volumeClaimTemplate.storageClassName=gp2 \
+            --set volumeClaimTemplate.resources.requests.storage=1Gi \
+            --set resources.requests.memory=512Mi \
+            --set resources.requests.cpu=250m \
+            --set resources.limits.memory=1Gi \
+            --set resources.limits.cpu=500m \
+            --timeout 15m
 
       - name: Install/Upgrade Kibana
         run: |
