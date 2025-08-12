@@ -63,6 +63,7 @@ jobs:
             --namespace observability \
             -f charts-values/elasticsearch-values.yaml
 
+
       - name: Install/Upgrade Kibana
         run: |
           helm upgrade --install kibana elastic/kibana \

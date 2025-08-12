@@ -21,4 +21,5 @@ volumeClaimTemplate:
 
 # For quick demo disable persistence if you prefer ephemeral (set to true for real use)
 persistence:
-  enabled: true
+  enabled: false
+  storageClass: "gp2"
