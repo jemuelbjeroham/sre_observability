@@ -9,6 +9,8 @@ grafana:
     enabled: false
 
 prometheus:
+  service:
+    type: LoadBalancer
   prometheusSpec:
     evaluationInterval: "30s"
     scrapeInterval: "30s"

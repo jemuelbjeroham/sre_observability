@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: default-namespace-all
+  namespace: observability
+  labels:
+    release: kube-prom-stack
+spec:
+  selector: {}   # Matches all services
+  namespaceSelector:
+    matchNames:
+      - default
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+      scheme: http
