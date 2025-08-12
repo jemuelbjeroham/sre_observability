@@ -20,6 +20,6 @@ volumeClaimTemplate:
       storage: 10Gi
 
 # For quick demo disable persistence if you prefer ephemeral (set to true for real use)
-persistence:
-  enabled: false
-  storageClass: "gp2"
+# persistence:
+#   enabled: false
+#   storageClass: "gp2"
