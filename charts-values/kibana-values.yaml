@@ -1,0 +1,5 @@
+service:
+  type: LoadBalancer
+
+# Kibana will connect to the Elasticsearch service installed in same namespace.
+elasticsearchHosts: "http://elasticsearch-master.observability.svc.cluster.local:9200"

@@ -1,0 +1,24 @@
+replicas: 1
+
+esConfig:
+  elasticsearch.yml: |
+    xpack.security.enabled: false
+    xpack.ml.enabled: false
+
+resources:
+  limits:
+    cpu: "1"
+    memory: "2Gi"
+  requests:
+    cpu: "500m"
+    memory: "1Gi"
+
+volumeClaimTemplate:
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 10Gi
+
+# For quick demo disable persistence if you prefer ephemeral (set to true for real use)
+persistence:
+  enabled: true

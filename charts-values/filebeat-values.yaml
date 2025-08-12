@@ -1,0 +1,32 @@
+filebeatConfig:
+  filebeat.yml: |
+    filebeat.inputs:
+    - type: container
+      paths:
+        - /var/log/containers/*.log
+      multiline.pattern: '^[[:space:]]'
+      multiline.negate: false
+      multiline.match: after
+      processors:
+        - add_kubernetes_metadata:
+            in_cluster: true
+        - add_cloud_metadata: {}
+    output.elasticsearch:
+      # internal cluster DNS for Elasticsearch service created by the chart
+      hosts: ['http://elasticsearch-master.observability.svc.cluster.local:9200']
+    setup.kibana:
+      host: "http://kibana.observability.svc.cluster.local:5601"
+
+rbac:
+  create: true
+
+daemonset:
+  enabled: true
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 200Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

@@ -1,0 +1,76 @@
+name: Deploy Observability Stack
+
+on:
+  push:
+  branches:
+    - main
+
+env:
+  AWS_REGION: us-east-1
+  CLUSTER_NAME: sre-eks-cluster
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig for EKS
+        run: aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Add Helm repos
+        run: |
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo add elastic https://helm.elastic.co
+          helm repo update
+
+      - name: Install/Upgrade kube-prometheus-stack (Prometheus + Grafana)
+        run: |
+          helm upgrade --install kube-prom-stack prometheus-community/kube-prometheus-stack \
+            --namespace observability \
+            --create-namespace \
+            -f charts-values/kube-prometheus-values.yaml
+
+      # - name: Install Prometheus
+      #   run: |
+      #     helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
+      #       --namespace observability --create-namespace
+
+      # - name: Install Grafana (separate if needed)
+      #   run: |
+      #     helm upgrade --install grafana grafana/grafana \
+      #       --namespace observability \
+      #       --set adminPassword='admin123' \
+      #       --set service.type=LoadBalancer
+
+      - name: Install/Upgrade Elasticsearch
+        run: |
+          helm upgrade --install elasticsearch elastic/elasticsearch \
+            --namespace observability \
+            -f charts-values/elasticsearch-values.yaml
+
+      - name: Install/Upgrade Kibana
+        run: |
+          helm upgrade --install kibana elastic/kibana \
+            --namespace observability \
+            -f charts-values/kibana-values.yaml
+
+      - name: Install/Upgrade Filebeat
+        run: |
+          helm upgrade --install filebeat elastic/filebeat \
+            --namespace observability \
+            -f charts-values/filebeat-values.yaml

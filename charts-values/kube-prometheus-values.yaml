@@ -1,0 +1,23 @@
+# kube-prometheus-stack values
+grafana:
+  enabled: true
+  adminUser: admin
+  adminPassword: "ChangeMeNow!"   # rotate to a strong secret or use Kubernetes secret
+  service:
+    type: LoadBalancer
+  ingress:
+    enabled: false
+
+prometheus:
+  prometheusSpec:
+    evaluationInterval: "30s"
+    scrapeInterval: "30s"
+
+# disable persistent volume for quick demo; enable/persist in prod
+prometheus:
+  server:
+    persistentVolume:
+      enabled: false
+alertmanager:
+  persistentVolume:
+    enabled: false
